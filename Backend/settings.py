@@ -63,6 +63,7 @@ CORS_ALLOWED_ORIGINS = [
     'http://localhost:5173',
     'https://dev-aligator.github.io',
     'http://127.0.0.1',
+    'https://aligator.pythonanywhere.com',
     'http://0.0.0.0',
 ]
 
