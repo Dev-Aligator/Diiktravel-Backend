@@ -16,3 +16,5 @@ class Place(models.Model):
 
     distance_to_user = models.FloatField(null=True, blank=True)
 
+
+    
