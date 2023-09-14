@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from base.models import Place
+from base.models import Place, UserFeature
 from django.contrib.auth import get_user_model, authenticate
 
 
@@ -35,29 +35,7 @@ class UserSerializer(serializers.ModelSerializer):
 		model = UserModel
 		fields = ('email', 'username')
 
-# class RoleSerializer(serializers.ModelSerializer):
-#     class Meta:
-#         model = Role
-#         fields = '__all__'
-
-# class BannerSerializer(serializers.ModelSerializer):
-#     roles = RoleSerializer(many=True, read_only=True)  # Include the related roles
-
-#     class Meta:
-#         model = Banner
-#         fields = '__all__'
-
-# class SkillSerializer(serializers.ModelSerializer):
-#     class Meta:
-#         model = Skill
-#         fields = '__all__'
-
-# class ProjectSerializer(serializers.ModelSerializer):
-#     class Meta:
-#         model = Project
-#         fields = '__all__'
-
-# class ContactSerializer(serializers.ModelSerializer):
-#     class Meta:
-#         model = Contact
-#         fields = '__all__'
+class UserFeatureSerializer(serializers.ModelSerializer):
+	class Meta:
+		model = UserFeature
+		fields = '__all__'

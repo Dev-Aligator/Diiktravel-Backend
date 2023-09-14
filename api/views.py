@@ -1,7 +1,7 @@
 from rest_framework.response import Response
 from rest_framework.decorators import api_view
-from base.models import Place
-from .serializers import PlaceSerializer
+from base.models import Place, UserFeature
+from .serializers import PlaceSerializer, UserFeatureSerializer
 import json
 from thefuzz import fuzz
 import math
@@ -141,9 +141,16 @@ class UserLogout(APIView):
 
 
 class UserView(APIView):
-	permission_classes = (permissions.IsAuthenticated,)
-	authentication_classes = (SessionAuthentication,)
+    permission_classes = (permissions.IsAuthenticated,)
+    authentication_classes = (SessionAuthentication,)
 	##
-	def get(self, request):
-		serializer = UserSerializer(request.user)
-		return Response({'user': serializer.data}, status=status.HTTP_200_OK)
+    def get(self, request):
+        serializer = UserSerializer(request.user)
+        # userFeature = UserFeatureSerializer(user=request.user)
+        return Response({'user': serializer.data}, status=status.HTTP_200_OK)
+
+class IsAuthenticated(APIView):
+    permission_classes = (permissions.IsAuthenticated,)
+    authentication_classes = (SessionAuthentication,)
+    def get(self, request):
+        return Response({'authenticated': True}, status=status.HTTP_200_OK)
