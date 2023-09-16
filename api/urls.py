@@ -8,6 +8,7 @@ urlpatterns = [
     path('get/user/', views.UserView.as_view()),
     path('logout/', views.UserLogout.as_view()),
     path('authenticate/',views.IsAuthenticated.as_view()),
+    path('get/place_details/', views.PlaceDetailsApi.as_view()),
     # path('get/skills/', views.getSkillsData),
     # path('get/projects/', views.getProjectsData),
     # path('post/contact/', views.addContact),

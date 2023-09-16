@@ -1,11 +1,11 @@
 from rest_framework.response import Response
 from rest_framework.decorators import api_view
 from base.models import Place, UserFeature
-from .serializers import PlaceSerializer, UserFeatureSerializer
+from .serializers import PlaceSerializer, UserFeatureSerializer, PlaceDetailsSerializer
 import json
 from thefuzz import fuzz
 import math
-from .serializers import UserRegisterSerializer, UserLoginSerializer, UserSerializer
+from .serializers import UserRegisterSerializer, UserLoginSerializer, UserSerializer, PlaceDetails
 from rest_framework import permissions, status
 from .validations import custom_validation, validate_email, validate_password
 from django.contrib.auth import get_user_model, login, logout
@@ -103,7 +103,24 @@ def getDistance(lat1, lng1, lat2, lng2):
 
     return distance
 
-
+class PlaceDetailsApi(APIView):
+    permission_classes = (permissions.AllowAny,)
+    def get(self, request):
+        placeId = request.query_params.get('placeId', '')
+        if not placeId:
+            return Response(status=status.HTTP_400_BAD_REQUEST)
+        try:
+            placeDetails = PlaceDetails.objects.get(id=placeId)
+            place = Place.objects.get(googleMapId=placeId)
+        except:
+            return Response(status=status.HTTP_400_BAD_REQUEST)
+        serializerDetails = PlaceDetailsSerializer(placeDetails)
+        serializerPlace = PlaceSerializer(place)
+        response_data = {
+            'place': serializerPlace.data,
+            'details' : serializerDetails.data,
+        }
+        return Response(response_data)
 
 class UserRegister(APIView):
 	permission_classes = (permissions.AllowAny,)
