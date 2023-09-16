@@ -53,6 +53,8 @@ class PlaceAPI(APIView):
             place.distance_to_user = place_distance
             
             # Calculate the place score as matching score divided by distance
+            if place_distance == 0:
+                place_distance = 0.000001
             place_score = ( matching_score**1.4 ) / place_distance
             # Append the place and its score to the list
             filtered_places.append((place, place_score))
