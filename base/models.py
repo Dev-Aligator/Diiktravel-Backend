@@ -47,6 +47,25 @@ class PlaceDetails(models.Model):
     def __str__(self):
         return self.id
 
+class Review(models.Model):
+    author_id = models.CharField(blank=True, null=True, max_length=50)
+    place_id = models.CharField(blank=True, null=True, max_length=50)
+    author_name = models.CharField(max_length=255)
+    rating = models.PositiveIntegerField(choices=[(1, '1'), (2, '2'), (3, '3'), (4, '4'), (5, '5')])
+    relative_time_description = models.CharField(max_length=255)
+    time = models.BigIntegerField()
+    language = models.CharField(max_length=10, blank=True, null=True)
+    original_language = models.CharField(max_length=10, blank=True, null=True)
+    profile_photo_url = models.URLField(blank=True, null=True)
+    text = models.TextField(blank=True, null=True)
+    translated = models.BooleanField(default=False)
+    likes = models.PositiveIntegerField(default=0)
+    userLiked = models.TextField(max_length=None, default="")
+
+    def __str__(self):
+        return f'Review by {self.author_name} - Rating: {self.rating}'
+
+
 
 class UserFeature(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)

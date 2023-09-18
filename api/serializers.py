@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from base.models import Place, UserFeature, PlaceDetails
+from base.models import Place, UserFeature, PlaceDetails, Review
 from django.contrib.auth import get_user_model, authenticate
 
 
@@ -11,6 +11,11 @@ class PlaceSerializer(serializers.ModelSerializer):
 class PlaceDetailsSerializer(serializers.ModelSerializer):
 	class Meta:
 		model = PlaceDetails
+		fields = '__all__'
+
+class ReviewSerializer(serializers.ModelSerializer):
+	class Meta:
+		model = Review
 		fields = '__all__'
 
 UserModel = get_user_model()
