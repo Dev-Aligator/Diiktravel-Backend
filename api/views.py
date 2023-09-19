@@ -11,7 +11,8 @@ from .validations import custom_validation, validate_email, validate_password
 from django.contrib.auth import get_user_model, login, logout
 from rest_framework.authentication import SessionAuthentication
 from rest_framework.views import APIView
-
+from .csrfDessionAuthentication import CsrfExemptSessionAuthentication, BasicAuthentication
+import time
 class PlaceAPI(APIView):
     permission_classes = (permissions.AllowAny,)
     def get(self, request):
@@ -130,6 +131,7 @@ class PlaceDetailsApi(APIView):
 class ReviewUpdateLikes(APIView):
     permission_classes = (permissions.IsAuthenticated,)
     authentication_classes = (SessionAuthentication,)
+
     def get(self, request):
         reviewId = request.query_params.get('reviewId', '')
         username = request.user.username
@@ -152,11 +154,20 @@ class ReviewUpdateLikes(APIView):
 
         
 class AddReview(APIView):
-    permission_classes = (permissions.AllowAny,)
-    authentication_classes = ()
+    permission_classes = (permissions.IsAuthenticated,)
+    authentication_classes = (CsrfExemptSessionAuthentication, BasicAuthentication)
+
     def post(self, request):
-        print(request.data)
-        return Response(status=status.HTTP_200_OK)
+        data = request.data
+        try:
+            userFeature = UserFeature.objects.get(user=request.user)
+        except:
+            return Response(status=status.HTTP_403_FORBIDDEN)
+        
+        AuthorName = userFeature.firstName + userFeature.lastName
+        new_review = Review.objects.create(place_id=data['placeId'], author_name=AuthorName, rating=5, relative_time_description="", time=time.time(), language="vn", original_language="vn", profile_photo_url=userFeature.photoUrl, text=data['reviewText'], translated=False )
+        serializer = ReviewSerializer(new_review)
+        return Response({'new_review' : serializer.data}, status=status.HTTP_200_OK)
 
 
 

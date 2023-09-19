@@ -73,6 +73,7 @@ class UserFeature(models.Model):
     lastName = models.CharField(max_length=20, null=True, blank=True)
     lastLatitude = models.FloatField(null=True, blank=True)
     lastLongitude = models.FloatField(null=True, blank=True)
+    photoUrl = models.URLField(null=True, blank=True)
     # Add other fields for user details like oldest location, interests, etc.
 
     def __str__(self):
