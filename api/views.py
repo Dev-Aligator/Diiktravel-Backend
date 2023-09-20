@@ -118,6 +118,8 @@ class PlaceDetailsApi(APIView):
         except:
             return Response(status=status.HTTP_400_BAD_REQUEST)
         reviews = Review.objects.filter(place_id=placeId)
+        for review in reviews:
+            review.relative_time_description = secondsConverter(time.time() - review.time)
         serializerReview = ReviewSerializer(reviews, many=True)
         serializerDetails = PlaceDetailsSerializer(placeDetails)
         serializerPlace = PlaceSerializer(place)
@@ -224,3 +226,26 @@ class IsAuthenticated(APIView):
     authentication_classes = (SessionAuthentication,)
     def get(self, request):
         return Response({'authenticated': True}, status=status.HTTP_200_OK)
+
+
+def secondsConverter(seconds: int):
+    while True:
+        if seconds < 60:
+            return f"{int(seconds)}s"
+        else:
+            seconds //= 60
+            if seconds < 60:
+                return f"{int(seconds)}m"
+            else:
+                seconds //= 60
+                if seconds < 24:
+                    return f"{int(seconds)}h"
+                else:
+                    seconds //= 24
+                    if seconds < 30:
+                        return f"{int(seconds)}d"
+                    else:
+                        seconds //= 30
+                        if seconds < 12:
+                            return f"{int(seconds)} months ago"
+                        return f"{int(seconds // 12)} years ago"
