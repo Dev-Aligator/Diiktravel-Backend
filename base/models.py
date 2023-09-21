@@ -16,7 +16,6 @@ class Place(models.Model):
     rating = models.FloatField(null=True,blank=True)
     totalRating = models.FloatField(null=True,blank=True)
     photo = models.CharField(max_length=200, null=True, blank=True)
-
     distance_to_user = models.FloatField(null=True, blank=True)
 
 
@@ -25,8 +24,6 @@ class PlaceDetails(models.Model):
     current_opening_hours = models.CharField(max_length=255, blank=True, null=True)
     formatted_phone_number = models.CharField(max_length=20, blank=True, null=True)
     international_phone_number = models.CharField(max_length=20, blank=True, null=True)
-    opening_hours = models.CharField(max_length=255, blank=True, null=True)
-    secondary_opening_hours = models.CharField(max_length=255, blank=True, null=True)
     website = models.URLField(blank=True, null=True)
     curbside_pickup = models.BooleanField(default=False)
     delivery = models.BooleanField(default=False)
@@ -61,7 +58,7 @@ class Review(models.Model):
     translated = models.BooleanField(default=False)
     likes = models.PositiveIntegerField(default=0)
     userLiked = models.TextField(max_length=None, default="")
-
+    
     def __str__(self):
         return f'Review by {self.author_name} - Rating: {self.rating}'
 

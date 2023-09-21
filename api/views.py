@@ -13,6 +13,8 @@ from rest_framework.authentication import SessionAuthentication
 from rest_framework.views import APIView
 from .csrfDessionAuthentication import CsrfExemptSessionAuthentication, BasicAuthentication
 import time
+import datetime
+import ast
 class PlaceAPI(APIView):
     permission_classes = (permissions.AllowAny,)
     def get(self, request):
@@ -117,7 +119,7 @@ class PlaceDetailsApi(APIView):
             place = Place.objects.get(googleMapId=placeId)
         except:
             return Response(status=status.HTTP_400_BAD_REQUEST)
-        reviews = Review.objects.filter(place_id=placeId)
+        reviews = Review.objects.filter(place_id=placeId).order_by('-id')
         for review in reviews:
             review.relative_time_description = secondsConverter(time.time() - review.time)
         serializerReview = ReviewSerializer(reviews, many=True)
@@ -127,6 +129,7 @@ class PlaceDetailsApi(APIView):
             'place': serializerPlace.data,
             'details' : serializerDetails.data,
             'reviews' : serializerReview.data,
+            'openingHours': getPlaceCurrentOpeningHours(placeDetails.current_opening_hours)
         }
         return Response(response_data)
 
@@ -166,8 +169,12 @@ class AddReview(APIView):
         except:
             return Response(status=status.HTTP_403_FORBIDDEN)
         
+        ## Adding 1 to place total reviews
+        reviewedPlace = Place.objects.get(googleMapId=data['placeId'])
+        reviewedPlace.totalRating += 1
+        reviewedPlace.save()
         AuthorName = userFeature.firstName + userFeature.lastName
-        new_review = Review.objects.create(place_id=data['placeId'], author_name=AuthorName, rating=5, relative_time_description="", time=time.time(), language="vn", original_language="vn", profile_photo_url=userFeature.photoUrl, text=data['reviewText'], translated=False )
+        new_review = Review.objects.create(place_id=data['placeId'], author_name=AuthorName, rating=data['star'], relative_time_description="", time=time.time(), language="vn", original_language="vn", profile_photo_url=userFeature.photoUrl, text=data['reviewText'], translated=False )
         serializer = ReviewSerializer(new_review)
         return Response({'new_review' : serializer.data}, status=status.HTTP_200_OK)
 
@@ -249,3 +256,28 @@ def secondsConverter(seconds: int):
                         if seconds < 12:
                             return f"{int(seconds)} months ago"
                         return f"{int(seconds // 12)} years ago"
+
+
+def getPlaceCurrentOpeningHours(current_opening_hours):
+    if not current_opening_hours:
+        return "Unknown opening hours"
+    weeklyHours = ast.literal_eval(current_opening_hours)
+    # Get the current UTC time
+    utc_time = datetime.datetime.utcnow()
+
+    # Calculate the GMT+7 offset (7 hours ahead of GMT)
+    gmt7_offset = datetime.timedelta(hours=7)
+
+    # Calculate the GMT+7 time by adding the offset to the UTC time
+    gmt7_time = utc_time + gmt7_offset
+
+    # Get the current weekday (0 = Monday, 1 = Tuesday, ..., 6 = Sunday)
+    weekday = gmt7_time.weekday()
+
+    # Get the current hour
+    hour = gmt7_time.hour
+
+    # Print the current weekday and hour in GMT+7
+    # print("Current Weekday in GMT+7:", weekday)
+    # print("Current Hour in GMT+7:", hour)
+    return weeklyHours[weekday]
