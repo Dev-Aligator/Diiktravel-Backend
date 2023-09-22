@@ -173,7 +173,10 @@ class AddReview(APIView):
         reviewedPlace = Place.objects.get(googleMapId=data['placeId'])
         reviewedPlace.totalRating += 1
         reviewedPlace.save()
-        AuthorName = userFeature.firstName + userFeature.lastName
+        try:
+            AuthorName = userFeature.firstName + userFeature.lastName
+        except:
+            AuthorName = "Default username"
         new_review = Review.objects.create(place_id=data['placeId'], author_name=AuthorName, rating=data['star'], relative_time_description="", time=time.time(), language="vn", original_language="vn", profile_photo_url=userFeature.photoUrl, text=data['reviewText'], translated=False )
         serializer = ReviewSerializer(new_review)
         return Response({'new_review' : serializer.data}, status=status.HTTP_200_OK)
