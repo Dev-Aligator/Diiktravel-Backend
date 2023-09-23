@@ -1,6 +1,6 @@
 from rest_framework.response import Response
 from rest_framework.decorators import api_view
-from base.models import Place, UserFeature, Review, PlaceDetails
+from base.models import Place, UserFeature, Review, PlaceDetails, User
 from .serializers import PlaceSerializer, UserFeatureSerializer, PlaceDetailsSerializer, ReviewSerializer
 import json
 from thefuzz import fuzz
@@ -228,8 +228,28 @@ class UserView(APIView):
 	##g
     def get(self, request):
         serializer = UserSerializer(request.user)
-        # userFeature = UserFeatureSerializer(user=request.user)
-        return Response({'user': serializer.data}, status=status.HTTP_200_OK)
+        user = User.objects.get(username=request.user)
+        userFeature = UserFeature.objects.get(user=user.id)
+        userFeatureSerializer = UserFeatureSerializer(userFeature)
+        return Response({'user': serializer.data, 'user_details' : userFeatureSerializer.data}, status=status.HTTP_200_OK)
+
+class UpdateUser(APIView):
+    permission_classes = (permissions.IsAuthenticated,)
+    authentication_classes = (CsrfExemptSessionAuthentication, BasicAuthentication)
+
+    def post(self, request):
+        data = request.data
+        try:
+            userFeature = UserFeature.objects.get(user=request.user)
+        except:
+            return Response(status=status.HTTP_403_FORBIDDEN)
+        
+        userFeature.firstName = data['firstName']
+        userFeature.lastName = data['lastName']
+        userFeature.photoUrl = data['photoUrl']
+        userFeature.save()
+        return Response(status=status.HTTP_200_OK)
+
 
 class IsAuthenticated(APIView):
     permission_classes = (permissions.IsAuthenticated,)
