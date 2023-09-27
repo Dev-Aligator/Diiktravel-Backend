@@ -1,7 +1,7 @@
 from rest_framework.response import Response
 from rest_framework.decorators import api_view
-from base.models import Place, UserFeature, Review, PlaceDetails, User
-from .serializers import PlaceSerializer, UserFeatureSerializer, PlaceDetailsSerializer, ReviewSerializer
+from base.models import Place, UserFeature, Review, PlaceDetails, User, UserSavePlace
+from .serializers import PlaceSerializer, UserFeatureSerializer, PlaceDetailsSerializer, ReviewSerializer, UserSavedPlaceSerializer
 import json
 from thefuzz import fuzz
 import math
@@ -256,6 +256,38 @@ class IsAuthenticated(APIView):
     authentication_classes = (SessionAuthentication,)
     def get(self, request):
         return Response({'authenticated': True}, status=status.HTTP_200_OK)
+
+
+class UserSavedPlaceAPI(APIView):
+    permission_classes = (permissions.IsAuthenticated,)
+    authentication_classes = (SessionAuthentication,)
+
+    def get(self, request):
+        action = request.query_params.get('action', '')
+        placeId = request.query_params.get('placeId', '')
+        if action == 'AddSelectedPlaceToUserSavedPlaces':
+            selectedPlace = Place.objects.get(googleMapId=placeId)
+            try:
+                newlySavedPlace = UserSavePlace.objects.create(user=request.user, place=selectedPlace)
+                serializer = UserSavedPlaceSerializer(newlySavedPlace)
+                return Response({'newlySavedPlace' : serializer.data}, status=status.HTTP_200_OK)
+            except Exception as error:
+                print(f"An error occurred: {error}")
+                return Response(status=status.HTTP_400_BAD_REQUEST)
+
+        elif action == 'GetUserAllSavedPlaces':
+            try:
+                previousUserSavedPlaces = UserSavePlace.objects.filter(user=request.user)
+                savedPlacesData = Place.objects.filter(usersaveplace__in=previousUserSavedPlaces)
+                serializer = UserSavedPlaceSerializer(previousUserSavedPlaces, many=True)
+                placesSerializer = PlaceSerializer(savedPlacesData, many=True)
+                return Response({"user_saved_places" : serializer.data, "saved-places": placesSerializer.data}, status=status.HTTP_200_OK)
+            except Exception as error:
+                print(f"An error occurred: {error}")
+                return Response(status=status.HTTP_400_BAD_REQUEST)
+
+
+
 
 
 def secondsConverter(seconds: int):

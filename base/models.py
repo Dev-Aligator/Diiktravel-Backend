@@ -63,6 +63,17 @@ class Review(models.Model):
         return f'Review by {self.author_name} - Rating: {self.rating}'
 
 
+class UserSavePlace(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE, blank=True, null=True)
+    place = models.ForeignKey(Place, on_delete=models.CASCADE)  # Link to the Place model
+    saved_date = models.DateTimeField(auto_now_add=True)  # This sets the date to auto add when an instance is created
+
+    class Meta:
+        unique_together = ['user', 'place']
+
+    def __str__(self):
+        return f"SavedPlace by {self.user} - Place ID: {self.place_id}"
+
 
 class UserFeature(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
@@ -83,3 +94,4 @@ def create_user_feature(sender, instance, created, **kwargs):
 
 # Connect the signal
 post_save.connect(create_user_feature, sender=User)
+
