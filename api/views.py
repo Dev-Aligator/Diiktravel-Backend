@@ -285,6 +285,16 @@ class UserSavedPlaceAPI(APIView):
             except Exception as error:
                 print(f"An error occurred: {error}")
                 return Response(status=status.HTTP_400_BAD_REQUEST)
+        elif action == 'RemoveSelectedPlaceFromUserSavedPlaces':
+            try:
+                savedPlaceId = request.query_params.get('savedPlaceId', '')
+                selectedToRemovePlace = UserSavePlace.objects.get(id=savedPlaceId)
+                selectedToRemovePlace.delete()
+                return Response(status=status.HTTP_200_OK)
+            except Exception as error:
+                print(f"An error occurred: {error}")
+                return Response(status=status.HTTP_400_BAD_REQUEST)   
+
 
 
 
