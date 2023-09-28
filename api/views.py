@@ -169,6 +169,9 @@ class AddReview(APIView):
         except:
             return Response(status=status.HTTP_403_FORBIDDEN)
         
+        if Review.objects.get(author_id=request.user.id, place_id=data['placeId']):
+            return Response(status=status.HTTP_409_CONFLICT)
+
         ## Adding 1 to place total reviews
         reviewedPlace = Place.objects.get(googleMapId=data['placeId'])
         reviewedPlace.totalRating += 1
@@ -306,11 +309,17 @@ class UserReviewAPI(APIView):
         if action == 'GetAllUserReviews':
             try:
                 totalUserReviews = Review.objects.filter(author_id=request.user.id)
+                reviewedPlacesId = [userReview.place_id for userReview in totalUserReviews]
+                reviewedPlacesData = Place.objects.filter(googleMapId__in=reviewedPlacesId)
                 serializer = ReviewSerializer(totalUserReviews, many=True)
-                return Response({'user_total_reviews' : serializer.data}, status=status.HTTP_200_OK)
+                placeSerializer = PlaceSerializer(reviewedPlacesData, many=True)
+                return Response({'user_total_reviews' : serializer.data, 'places_data' : placeSerializer.data}, status=status.HTTP_200_OK)
             except Exception as error:
                 print(f"An error occurred: {error}")
                 return Response(status=status.HTTP_400_BAD_REQUEST) 
+        else:
+            return Response(status=status.HTTP_400_BAD_REQUEST) 
+
 
 def secondsConverter(seconds: int):
     while True:
