@@ -169,8 +169,11 @@ class AddReview(APIView):
         except:
             return Response(status=status.HTTP_403_FORBIDDEN)
         
-        if Review.objects.get(author_id=request.user.id, place_id=data['placeId']):
+        try:
+            Review.objects.get(author_id=request.user.id, place_id=data['placeId'])
             return Response(status=status.HTTP_409_CONFLICT)
+        except:
+            pass
 
         ## Adding 1 to place total reviews
         reviewedPlace = Place.objects.get(googleMapId=data['placeId'])
