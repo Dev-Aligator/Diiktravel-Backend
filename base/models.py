@@ -49,7 +49,7 @@ class Review(models.Model):
     place_id = models.CharField(blank=True, null=True, max_length=50)
     author_name = models.CharField(max_length=255)
     rating = models.PositiveIntegerField(choices=[(1, '1'), (2, '2'), (3, '3'), (4, '4'), (5, '5')])
-    relative_time_description = models.CharField(max_length=255)
+    relative_time_description = models.CharField(max_length=255, null=True, blank=True)
     time = models.BigIntegerField()
     language = models.CharField(max_length=10, blank=True, null=True)
     original_language = models.CharField(max_length=10, blank=True, null=True)
@@ -74,7 +74,16 @@ class UserSavePlace(models.Model):
     def __str__(self):
         return f"SavedPlace by {self.user} - Place ID: {self.place_id}"
 
+class UserLeftReview(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE, blank=True, null=True)
+    review = models.ForeignKey(Review, on_delete=models.CASCADE)
+    date = models.DateTimeField(auto_now_add=True)
+    
+    class Meta:
+        unique_together = ['user', 'review']
 
+    def __str__(self):
+        return f"Review by {self.user} - ID: {self.review.id}"
 class UserFeature(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     firstName = models.CharField(max_length=20, null=True, blank=True)

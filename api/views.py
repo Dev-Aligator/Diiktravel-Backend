@@ -177,7 +177,7 @@ class AddReview(APIView):
             AuthorName = userFeature.firstName + userFeature.lastName
         except:
             AuthorName = "Default username"
-        new_review = Review.objects.create(place_id=data['placeId'], author_name=AuthorName, rating=data['star'], relative_time_description="", time=time.time(), language="vn", original_language="vn", profile_photo_url=userFeature.photoUrl, text=data['reviewText'], translated=False )
+        new_review = Review.objects.create(place_id=data['placeId'], author_id=request.user.id, author_name=AuthorName, rating=data['star'], relative_time_description="", time=time.time(), language="vn", original_language="vn", profile_photo_url=userFeature.photoUrl, text=data['reviewText'], translated=False )
         serializer = ReviewSerializer(new_review)
         return Response({'new_review' : serializer.data}, status=status.HTTP_200_OK)
 
@@ -297,8 +297,20 @@ class UserSavedPlaceAPI(APIView):
 
 
 
+class UserReviewAPI(APIView):
+    permission_classes = (permissions.IsAuthenticated,)
+    authentication_classes = (SessionAuthentication,)
 
-
+    def get(self, request):
+        action = request.query_params.get('action', '')
+        if action == 'GetAllUserReviews':
+            try:
+                totalUserReviews = Review.objects.filter(author_id=request.user.id)
+                serializer = ReviewSerializer(totalUserReviews, many=True)
+                return Response({'user_total_reviews' : serializer.data}, status=status.HTTP_200_OK)
+            except Exception as error:
+                print(f"An error occurred: {error}")
+                return Response(status=status.HTTP_400_BAD_REQUEST) 
 
 def secondsConverter(seconds: int):
     while True:

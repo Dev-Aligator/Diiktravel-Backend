@@ -13,6 +13,8 @@ urlpatterns = [
     path('post/add_review/', views.AddReview.as_view()),
     path('post/update_user/', views.UpdateUser.as_view()),
     path('get/save_place/', views.UserSavedPlaceAPI.as_view()),
+    path('get/reviews/', views.UserReviewAPI.as_view()),
+    
     # path('get/skills/', views.getSkillsData),
     # path('get/projects/', views.getProjectsData),
     # path('post/contact/', views.addContact),
