@@ -3,8 +3,6 @@ from io import StringIO
 from pathlib import Path
 
 import joblib
-import sklearn
-import unicodedata
 import numpy as np
 import pandas as pd
 import demoji
