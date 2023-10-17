@@ -15,6 +15,7 @@ from .csrfDessionAuthentication import CsrfExemptSessionAuthentication, BasicAut
 import time
 import datetime
 import ast
+from .app import SentimentAnalysis
 class PlaceAPI(APIView):
     permission_classes = (permissions.AllowAny,)
     def get(self, request):
@@ -132,6 +133,14 @@ class PlaceDetailsApi(APIView):
             'openingHours': getPlaceCurrentOpeningHours(placeDetails.current_opening_hours)
         }
         return Response(response_data)
+
+class SentimentAnalysisApi(APIView):
+    permission_classes = (permissions.AllowAny,)
+    def get(self, request):
+        review = request.query_params.get('input', '')
+        aspects_sentiments = SentimentAnalysis(review)
+        return Response( {'aspects_sentiments' : aspects_sentiments}, status=status.HTTP_200_OK)
+
 
 class ReviewUpdateLikes(APIView):
     permission_classes = (permissions.IsAuthenticated,)
