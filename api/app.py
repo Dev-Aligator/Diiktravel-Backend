@@ -10,7 +10,6 @@ import pandas as pd
 import demoji
 from functools import partial
 from flashtext import KeywordProcessor
-from sklearn.base import BaseEstimator, TransformerMixin
 
 HASHTAG = 'hashtag'
 
@@ -29,23 +28,6 @@ aspects = ["FOOD#PRICES",
 
 sentiments_mapping = {1: 'negative', 2: "neutral", 3: "positive"}
 
-class TextCleanerBase(BaseEstimator, TransformerMixin):
-    def __init__(self):
-        super().__init__()
-
-        # Create preprocessing function
-        self.normalize_unicode = partial(unicodedata.normalize, 'NFC')
-            
-    def fit(self, X, y=None):
-        return self
-
-    def transform(self, X):
-        if not isinstance(X, pd.Series):
-            X = pd.Series(X)
-
-        return X.apply(str.lower) \
-                .apply(remove_emojis) \
-                .apply(self.normalize_unicode)
 
 pipeline_fp = Path('api/pipe.joblib')
 
