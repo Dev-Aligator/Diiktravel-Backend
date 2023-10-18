@@ -1,7 +1,7 @@
 from rest_framework.response import Response
 from rest_framework.decorators import api_view
-from base.models import Place, UserFeature, Review, PlaceDetails, User, UserSavePlace
-from .serializers import PlaceSerializer, UserFeatureSerializer, PlaceDetailsSerializer, ReviewSerializer, UserSavedPlaceSerializer
+from base.models import Place, UserFeature, Review, PlaceDetails, User, UserSavePlace, NgrokUrl
+from .serializers import PlaceSerializer, UserFeatureSerializer, PlaceDetailsSerializer, ReviewSerializer, UserSavedPlaceSerializer, NgrokSerializer
 import json
 from thefuzz import fuzz
 import math
@@ -141,6 +141,11 @@ class SentimentAnalysisApi(APIView):
         aspects_sentiments = SentimentAnalysis(review)
         return Response( {'aspects_sentiments' : aspects_sentiments}, status=status.HTTP_200_OK)
 
+class NgrokAPI(APIView):
+    permission_classes = (permissions.AllowAny,)
+    def get(self, request):
+        ngrok = NgrokUrl.objects.first()
+        return Response( {'ngrok_url' : ngrok.ngrok_url}, status=status.HTTP_200_OK)
 
 class ReviewUpdateLikes(APIView):
     permission_classes = (permissions.IsAuthenticated,)

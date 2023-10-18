@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from base.models import Place, UserFeature, PlaceDetails, Review, UserSavePlace
+from base.models import Place, UserFeature, PlaceDetails, Review, UserSavePlace, NgrokUrl
 from django.contrib.auth import get_user_model, authenticate
 
 
@@ -8,6 +8,11 @@ class PlaceSerializer(serializers.ModelSerializer):
         model = Place
         fields = '__all__'
 
+class NgrokSerializer(serializers.ModelSerializer):
+	class Meta:
+		model = NgrokUrl
+		fields = '__all__'
+		
 class PlaceDetailsSerializer(serializers.ModelSerializer):
 	class Meta:
 		model = PlaceDetails

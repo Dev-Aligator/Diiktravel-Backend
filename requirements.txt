@@ -4,5 +4,3 @@ django-cors-headers
 pillow
 pandas
 thefuzz
-demoji
-flashtext

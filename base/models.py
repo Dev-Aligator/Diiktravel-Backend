@@ -18,6 +18,9 @@ class Place(models.Model):
     photo = models.CharField(max_length=200, null=True, blank=True)
     distance_to_user = models.FloatField(null=True, blank=True)
 
+class NgrokUrl(models.Model):
+    ngrok_url = models.CharField(max_length=200)
+
 
 class PlaceDetails(models.Model):
     id = models.CharField(max_length=255, primary_key=True)
